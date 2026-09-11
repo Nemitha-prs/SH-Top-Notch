@@ -1,0 +1,27 @@
+{
+  "name": "sh-top-notch",
+  "version": "1.0.0",
+  "description": "Static, mobile-first website for SH Top Notch premium mobile auto detailing.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nemitha-prs/SH-Top-Notch.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Nemitha-prs/SH-Top-Notch/issues"
+  },
+  "homepage": "https://github.com/Nemitha-prs/SH-Top-Notch#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
+    "dotenv": "^17.4.2",
+    "resend": "^6.27.0",
+    "sharp": "^0.35.4"
+  }
+}

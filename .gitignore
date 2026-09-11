@@ -1,0 +1,23 @@
+# Local environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and generated output
+node_modules/
+.vercel/
+dist/
+build/
+
+# Logs and local tooling
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.vercel
+node_modules/
+.env*
+!.env.example
+.vercel/
+gallery/
+*.log
