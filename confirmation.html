@@ -1,21 +1,21 @@
-<!doctype html>
-<html lang="en-AU">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Booking confirmation for SH Top Notch Auto Detailing.">
-  <title>Booking Received | SH Top Notch</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmed | SH Top Notch Auto Detailing</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="confirmation-page">
-  <header class="site-header"><div class="container nav"><a class="brand" href="index.html"><b class="brand-mark">SH</b><span>SH Top Notch</span></a><nav class="nav-links" aria-label="Main navigation"><a href="index.html">Home</a><a href="services.html">Services</a><a class="nav-cta" href="book.html">Book Now</a></nav></div></header>
-  <main class="confirmation-main"><section class="confirmation-card" aria-labelledby="confirmation-title">
-    <div class="confirmation-check" aria-hidden="true"><svg viewBox="0 0 52 52" role="img"><circle cx="26" cy="26" r="24"></circle><path d="m15 27 7 7 15-16"></path></svg></div>
-    <p class="eyebrow">SH TOP NOTCH / RECEIPT</p><h1 id="confirmation-title">Booking Successfully Received!</h1><p class="confirmation-lede">Your mobile detailing slot is reserved. A confirmation email has been dispatched.</p>
-    <div class="receipt-grid"><div><small>Service Package</small><strong id="confPackage"></strong></div><div><small>Vehicle</small><strong id="confVehicle"></strong></div><div><small>Date &amp; Time</small><strong id="confDateTime"></strong></div><div><small>Service Location</small><strong id="confAddress"></strong></div><div><small>Client Contact</small><strong id="confContact"></strong></div></div>
-    <div class="confirmation-actions"><a id="confGoogleCalBtn" target="_blank" rel="noopener noreferrer" class="btn btn-primary">📅 Add to Google Calendar</a><button id="confIcsBtn" class="btn btn-secondary" type="button">📥 Download .ics Calendar File</button></div>
-    <p id="confirmationFallback" class="confirmation-fallback" hidden>No recent booking found. <a href="book.html">Return to booking page.</a></p><a href="index.html" class="return-home-link">← Return to Homepage</a>
-  </section></main>
+<body class="light-theme">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="container nav"><a class="brand" href="index.html"><b class="brand-mark">SH</b><span>SH Top Notch</span></a><button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><i></i><i></i><i></i></button><nav class="nav-links" aria-label="Main navigation"><a href="index.html">Home</a><a href="services.html">Services</a><a href="gallery.html">Gallery</a><a class="nav-cta" href="book.html">Book Now</a></nav></div></header>
+  <main id="main" class="confirmation-section light-theme"><div class="container"><div class="receipt-wrapper">
+    <div class="receipt-title-block"><h2>Booking Confirmed</h2><p>We've reserved your slot. A confirmation email has been sent.</p></div>
+    <div class="receipt-header-row"><div><span class="receipt-label">STATUS</span><div class="receipt-status"><span class="status-dot"></span> Confirmed &amp; Scheduled</div></div><div class="receipt-ref"><span class="receipt-label">BOOKING ID</span><span id="confId" class="receipt-val mono">#SH-PENDING</span></div></div>
+    <div class="receipt-details-table"><div class="receipt-row"><span class="col-label">Selected Package</span><span id="confPackage" class="col-value highlight">-</span></div><div class="receipt-row"><span class="col-label">Vehicle</span><span id="confVehicle" class="col-value">-</span></div><div class="receipt-row"><span class="col-label">Date &amp; Time</span><span id="confDateTime" class="col-value">-</span></div><div class="receipt-row"><span class="col-label">Service Location</span><span id="confAddress" class="col-value">-</span></div><div class="receipt-row"><span class="col-label">Contact Details</span><span id="confContact" class="col-value">-</span></div></div>
+    <div class="receipt-actions"><a id="confGoogleCalBtn" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Add to Google Calendar</a><button id="confIcsBtn" class="btn btn-secondary" type="button">Download .ics File</button><a href="index.html" class="btn btn-outline">Return to Home</a></div>
+    <p id="confirmationFallback" class="confirmation-fallback" hidden>No recent booking found. <a href="book.html">Return to booking page.</a></p>
+  </div></div></main>
   <script src="js/confirmation.js"></script>
 </body>
 </html>
