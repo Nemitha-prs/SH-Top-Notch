@@ -34,8 +34,9 @@ export default async function handler(request, response) {
   const supabaseUrl = process.env.SUPABASE_URL?.trim();
   const supabaseKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY)?.trim();
   const resendApiKey = process.env.RESEND_API_KEY?.trim();
-  const ownerEmail = process.env.OWNER_EMAIL?.trim();
-  const fromEmail = process.env.FROM_EMAIL?.trim() || 'SH Top Notch <onboarding@resend.dev>';
+  const ownerEmail = process.env.OWNER_EMAIL?.replace(/^["']|["']$/g, '').trim() || 'hemsworkplace@gmail.com';
+  const fromEmailRaw = (process.env.FROM_EMAIL || 'noreply@shtopnotch.com.au').replace(/^["']|["']$/g, '').trim();
+  const fromEmail = fromEmailRaw.includes('<') ? fromEmailRaw : `SH Top Notch <${fromEmailRaw}>`;
   console.log('--- [API/BOOK ENVIRONMENT CHECK] ---');
   console.log('SUPABASE_URL:', supabaseUrl ? 'FOUND' : 'MISSING');
   console.log('SUPABASE_KEY:', supabaseKey ? 'FOUND' : 'MISSING');
