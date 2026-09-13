@@ -13,6 +13,21 @@
     <div class="receipt-title-block"><h2>Booking Confirmed</h2><p>We've reserved your slot. A confirmation email has been sent.</p></div>
     <div class="receipt-header-row"><div><span class="receipt-label">STATUS</span><div class="receipt-status"><span class="status-dot"></span> Confirmed &amp; Scheduled</div></div><div class="receipt-ref"><span class="receipt-label">BOOKING ID</span><span id="confId" class="receipt-val mono">#SH-PENDING</span></div></div>
     <div class="receipt-details-table"><div class="receipt-row"><span class="col-label">Selected Package</span><span id="confPackage" class="col-value highlight">-</span></div><div class="receipt-row"><span class="col-label">Vehicle</span><span id="confVehicle" class="col-value">-</span></div><div class="receipt-row"><span class="col-label">Date &amp; Time</span><span id="confDateTime" class="col-value">-</span></div><div class="receipt-row"><span class="col-label">Service Location</span><span id="confAddress" class="col-value">-</span></div><div class="receipt-row"><span class="col-label">Contact Details</span><span id="confContact" class="col-value">-</span></div></div>
+    <div class="receipt-row dropoff-location-card">
+      <div class="dropoff-header">
+        <span class="receipt-label">Drop-off Workshop Address</span>
+        <strong class="dropoff-address">9 Addingham Dr, Ellenbrook WA 6069</strong>
+        <p class="dropoff-note">Please bring your vehicle to this address at your reserved appointment time.</p>
+      </div>
+      <div class="dropoff-action">
+        <a href="https://maps.app.goo.gl/5TtnbEDvK2AeSDVg6" target="_blank" rel="noopener noreferrer" class="btn-directions">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+          </svg>
+          Get Directions on Google Maps
+        </a>
+      </div>
+    </div>
     <div class="receipt-actions"><a id="confGoogleCalBtn" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Add to Google Calendar</a><button id="confIcsBtn" class="btn btn-secondary" type="button">Download .ics File</button><a href="index.html" class="btn btn-outline">Return to Home</a></div>
     <p id="confirmationFallback" class="confirmation-fallback" hidden>No recent booking found. <a href="book.html">Return to booking page.</a></p>
   </div></div></main>

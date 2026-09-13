@@ -10,6 +10,8 @@ Import the repository into Vercel with the project root as the deployment direct
 - `OWNER_EMAIL` - email address that receives new booking alerts.
 - `FROM_EMAIL` - verified Resend sender, for example `bookings@yourdomain.com.au`.
 
+> **Important:** Resend's sandbox sender (`onboarding@resend.dev`) can only deliver mail to the email address you signed up to Resend with. If `FROM_EMAIL` is left on the sandbox sender, customer confirmation emails will silently fail while owner alerts (sent to that same signup address) keep working. To email real customers, [verify a domain in Resend](https://resend.com/domains) and set `FROM_EMAIL` to an address on that domain.
+
 The Google review link in `index.html` contains a placeholder Place ID. Replace `REPLACE_WITH_YOUR_PLACE_ID` with the business Place ID before launch.
 
 ## Local preview
