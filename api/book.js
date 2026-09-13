@@ -72,42 +72,73 @@ export default async function handler(request, response) {
     const ownerCallUrl = `tel:${client_phone.replace(/\s+/g, '')}`;
     const bookingId = booking?.[0]?.id || '';
 
+    const sectionHeader = (label) => `<tr><td style="padding:24px 0 8px;font-family:Arial,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#1f2937;border-bottom:1px solid #e5e7eb">${label}</td></tr>`;
+    const detailRow = (label, value) => `<tr><td style="padding:6px 12px 6px 0;font-family:Arial,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;color:#4b5563;width:42%;vertical-align:top">${label}</td><td style="padding:6px 0;font-family:Arial,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;color:#111827;font-weight:600;vertical-align:top">${value}</td></tr>`;
+
     const customerHtml = `
-    <div style="background:#0b0f17;color:#f5f7fa;padding:32px 24px;font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto">
-      <h1 style="color:#00d2ff;margin:0 0 12px;font-size:22px">Booking Confirmed</h1>
-      <p style="line-height:1.6">Hi ${escapeHtml(client_name)},</p>
-      <p style="line-height:1.6">Thank you for choosing SH Top Notch Auto Detailing. Your workshop appointment is locked in.</p>
-
-      <h2 style="color:#00d2ff;font-size:15px;letter-spacing:.5px;border-bottom:1px solid #23303f;padding-bottom:6px;margin:28px 0 12px">APPOINTMENT TIMELINE</h2>
-      <p style="line-height:1.8;margin:0">
-        <strong>Date:</strong> ${escapeHtml(displayDate)}<br>
-        <strong>Drop-off Time (Start):</strong> ${escapeHtml(displayStartTime)}<br>
-        <strong>Estimated Ready Time:</strong> ${escapeHtml(displayEndTime)}<br>
-        <strong>Selected Package:</strong> ${escapeHtml(service_package)}<br>
-        <strong>Vehicle Type:</strong> ${escapeHtml(formattedVehicle)}
-      </p>
-
-      <h2 style="color:#00d2ff;font-size:15px;letter-spacing:.5px;border-bottom:1px solid #23303f;padding-bottom:6px;margin:28px 0 12px">WORKSHOP DROP-OFF ADDRESS</h2>
-      <p style="line-height:1.8;margin:0">
-        SH Top Notch Auto Detailing<br>
-        ${ADDRESS_LINE}<br>
-        <a href="${directionsUrl}" style="color:#00d2ff">Google Maps Directions</a>
-      </p>
-
-      <h2 style="color:#00d2ff;font-size:15px;letter-spacing:.5px;border-bottom:1px solid #23303f;padding-bottom:6px;margin:28px 0 12px">YOUR CONTACT DETAILS</h2>
-      <p style="line-height:1.8;margin:0">
-        <strong>Name:</strong> ${escapeHtml(client_name)}<br>
-        <strong>Mobile:</strong> ${escapeHtml(client_phone)}
-      </p>
-
-      <h2 style="color:#00d2ff;font-size:15px;letter-spacing:.5px;border-bottom:1px solid #23303f;padding-bottom:6px;margin:28px 0 12px">DROP-OFF INSTRUCTIONS</h2>
-      <p style="line-height:1.6;margin:0">Please arrive promptly at ${escapeHtml(displayStartTime)} so we can inspect the vehicle with you prior to commencing work. Please remove any personal valuables from the interior.</p>
-
-      <p style="line-height:1.8;margin:28px 0 4px">Need to reschedule or have questions?<br>
-      Call / WhatsApp us: <a href="tel:${OWNER_MOBILE.replace(/\s+/g, '')}" style="color:#00d2ff">${OWNER_MOBILE}</a><br>
-      Instagram: <a href="https://instagram.com/sh_topnotch" style="color:#00d2ff">@sh_topnotch</a></p>
-
-      <p style="margin-top:24px"><a href="${googleUrl}" style="color:#00d2ff">Add to Google Calendar</a></p>
+    <div style="background:#f4f6f8;padding:32px 16px;font-family:Arial,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px">
+        <tr>
+          <td style="padding:32px 32px 8px">
+            <h1 style="margin:0 0 12px;font-size:20px;color:#111827">Booking Confirmed ✅</h1>
+            <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#4b5563">Hi ${escapeHtml(client_name)},</p>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4b5563">Thank you for choosing SH Top Notch Auto Detailing. Your workshop appointment is confirmed.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 32px">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              ${sectionHeader('Appointment Details')}
+              <tr><td colspan="2">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px">
+                  ${detailRow('Date', escapeHtml(displayDate))}
+                  ${detailRow('Drop-off Time', escapeHtml(displayStartTime))}
+                  ${detailRow('Estimated Ready Time', escapeHtml(displayEndTime))}
+                  ${detailRow('Package', escapeHtml(service_package))}
+                  ${detailRow('Vehicle', escapeHtml(formattedVehicle))}
+                </table>
+              </td></tr>
+              ${sectionHeader('Workshop Address')}
+              <tr><td colspan="2" style="padding:8px 0 4px;font-size:14px;line-height:1.6;color:#111827">
+                SH Top Notch Auto Detailing<br>${ADDRESS_LINE}
+              </td></tr>
+              ${sectionHeader('Your Contact Details')}
+              <tr><td colspan="2">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px">
+                  ${detailRow('Name', escapeHtml(client_name))}
+                  ${detailRow('Mobile', escapeHtml(client_phone))}
+                </table>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 32px 8px">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding-right:8px" width="50%">
+                  <a href="${googleUrl}" style="display:block;background:#2563eb;color:#ffffff;text-align:center;padding:12px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:700">Add to Calendar</a>
+                </td>
+                <td style="padding-left:8px" width="50%">
+                  <a href="${directionsUrl}" style="display:block;background:#111827;color:#ffffff;text-align:center;padding:12px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:700">Get Directions</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 32px 32px">
+            <p style="margin:0;font-size:13px;line-height:1.6;color:#4b5563">Please arrive promptly at ${escapeHtml(displayStartTime)} so we can inspect the vehicle with you before starting. Please remove any personal valuables from the interior.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 32px;border-top:1px solid #e5e7eb;background:#f9fafb;border-radius:0 0 8px 8px">
+            <p style="margin:0 0 4px;font-size:13px;color:#4b5563">Phone: <a href="tel:${OWNER_MOBILE.replace(/\s+/g, '')}" style="color:#2563eb;text-decoration:none">${OWNER_MOBILE}</a></p>
+            <p style="margin:0 0 4px;font-size:13px;color:#4b5563">Email: <a href="mailto:info@shtopnotch.com.au" style="color:#2563eb;text-decoration:none">info@shtopnotch.com.au</a></p>
+            <p style="margin:0;font-size:13px;color:#4b5563">Instagram: <a href="https://instagram.com/sh_topnotch" style="color:#2563eb;text-decoration:none">@sh_topnotch</a></p>
+          </td>
+        </tr>
+      </table>
     </div>`;
 
     const ownerHtml = `
