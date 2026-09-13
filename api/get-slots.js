@@ -16,14 +16,11 @@ export default async function handler(request, response) {
   if (!supabaseUrl || !supabaseKey) { console.warn('Slot lookup skipped: Supabase credentials are missing.'); return emptySlots(response); }
   try {
     const bounds = dayBounds(date), supabase = createClient(normalizeSupabaseUrl(supabaseUrl), supabaseKey, { auth: { persistSession: false } });
-    let query = supabase.from('bookings').select('start_time,end_time,status').gte('start_time', bounds.start.toISOString()).lt('start_time', new Date(bounds.end).toISOString()).in('status', ['confirmed', 'pending']).order('start_time', { ascending: true });
-    const { data, error } = await query;
-    if (error) {
-      const fallbackQuery = await supabase.from('bookings').select('start_time,end_time,status').gte('start_time', bounds.start.toISOString()).lt('start_time', new Date(bounds.end).toISOString()).order('start_time', { ascending: true });
-      if (fallbackQuery.error) throw fallbackQuery.error;
-      const fallbackData = (fallbackQuery.data || []).filter((row) => !row.status || ['confirmed', 'pending'].includes(row.status));
-      return response.status(200).json({ success: true, bookedSlots: fallbackData.map((row) => ({ start: row.start_time, end: row.end_time })) });
-    }
-    return response.status(200).json({ success: true, bookedSlots: data.map((row) => ({ start: row.start_time, end: row.end_time })) });
+    // Filter status in JS, not via a DB-level .in()/.neq() filter: Postgres NULL fails those comparisons,
+    // which would silently drop bookings with no status set and let their slots double-book.
+    const { data, error } = await supabase.from('bookings').select('start_time,end_time,status').gte('start_time', bounds.start.toISOString()).lt('start_time', new Date(bounds.end).toISOString()).order('start_time', { ascending: true });
+    if (error) throw error;
+    const activeBookings = (data || []).filter((row) => row.status !== 'cancelled');
+    return response.status(200).json({ success: true, bookedSlots: activeBookings.map((row) => ({ start: row.start_time, end: row.end_time })) });
   } catch (error) { console.error('Could not read booking slots:', error); return emptySlots(response); }
 }

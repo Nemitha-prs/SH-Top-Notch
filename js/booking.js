@@ -7,11 +7,17 @@
   const availabilityCache = {};
   let currentStep = 1, bookedRanges = [], currentDuration = 0, selectedTime = '', currentSelectedTime = '';
   const pad = (value) => String(value).padStart(2, '0');
+  const PERTH_OFFSET_MS = 8 * 60 * 60 * 1000;
+  // Perth (Australia/Perth) has no DST, so shifting the UTC epoch by a fixed +8h and reading UTC getters yields Perth wall-clock time regardless of the visitor's local timezone.
+  const perthNow = () => new Date(Date.now() + PERTH_OFFSET_MS);
+  const perthTodayStr = () => { const p = perthNow(); return `${p.getUTCFullYear()}-${pad(p.getUTCMonth() + 1)}-${pad(p.getUTCDate())}`; };
+  const MIN_NOTICE_MS = 2 * 60 * 60 * 1000;
   const minutesFromTime = (time) => { const [hours, minutes] = time.split(':').map(Number); return hours * 60 + minutes; };
   const timeFromMinutes = (minutes) => `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
   const duration = () => durations[packageField.value]?.[vehicleField.value] || 0;
   const dateAtTime = (date, time) => new Date(`${date}T${time}:00+08:00`);
-  const isClosed = (date) => !date || !windows[new Date(`${date}T12:00:00+08:00`).getDay()];
+  const isPastDate = (date) => !date || date < perthTodayStr();
+  const isClosed = (date) => !date || isPastDate(date) || !windows[new Date(`${date}T12:00:00+08:00`).getDay()];
   const showLoadingSlots = () => {
     if (!slots) return;
     slots.innerHTML = '<div class="slots-loading"><span class="slots-spinner"></span><span>Checking live availability...</span></div>';
@@ -50,6 +56,7 @@
     const date = dateField.value, selectedDuration = duration(); currentDuration = selectedDuration;
     slots.innerHTML = '';
     if (!date || !selectedDuration) { slots.innerHTML = '<p class="slot-empty">Choose a service, vehicle, and date first.</p>'; return; }
+    if (isPastDate(date)) { slots.innerHTML = '<p class="slot-empty">This date has passed. Please choose another date.</p>'; slotStatus.textContent = ''; persistSelectedTime(''); return; }
     const dayWindow = windows[new Date(`${date}T12:00:00+08:00`).getDay()];
     if (!dayWindow) { slots.innerHTML = '<p class="slot-empty">This day is closed. Please choose another date.</p>'; slotStatus.textContent = ''; persistSelectedTime(''); return; }
     const fragment = document.createDocumentFragment();
@@ -59,14 +66,15 @@
       slotTimes.push(slotTime);
       const startDate = dateAtTime(date, slotTime);
       const endDate = new Date(startDate.getTime() + selectedDuration * 60000);
+      const tooSoon = startDate.getTime() < Date.now() + MIN_NOTICE_MS;
       const isBooked = bookedRangesData.some((range) => startDate < new Date(range.end) && endDate > new Date(range.start));
       const button = document.createElement('button');
       button.type = 'button'; button.className = 'time-slot'; button.textContent = slotTime; button.dataset.time = slotTime;
-      if (isBooked) {
+      if (isBooked || tooSoon) {
         button.disabled = true;
-        button.title = 'Booked / Unavailable';
+        button.title = tooSoon && !isBooked ? 'Requires at least 2 hours notice' : 'Booked / Unavailable';
         button.setAttribute('aria-disabled', 'true');
-        button.setAttribute('aria-label', `${slotTime}, booked`);
+        button.setAttribute('aria-label', `${slotTime}, ${tooSoon && !isBooked ? 'requires 2 hours notice' : 'booked'}`);
       } else {
         button.addEventListener('click', (event) => {
           event.preventDefault();
@@ -117,7 +125,7 @@
       slotStatus.textContent = 'Live availability is unavailable; showing operating-hour slots.';
     }
   };
-  const today = new Date(); today.setHours(0, 0, 0, 0); dateField.min = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+  const today = new Date(); today.setHours(0, 0, 0, 0); dateField.min = perthTodayStr();
   if (phoneInput) {
     phoneInput.addEventListener('input', () => {
       const phoneValue = phoneInput.value.trim();
@@ -128,7 +136,7 @@
   }
   packageField.addEventListener('change', () => { durationCopy.textContent = duration() ? `This appointment takes ${Math.floor(duration() / 60)} hours${duration() % 60 ? ` ${duration() % 60} minutes` : ''}.` : 'Your appointment duration will appear here.'; if (dateField.value) loadSlots(); });
   vehicleField.addEventListener('change', () => { packageField.dispatchEvent(new Event('change')); });
-  dateField.addEventListener('change', () => { const closed = isClosed(dateField.value); dateField.classList.toggle('closed-date', closed); dateField.setCustomValidity(closed ? 'Tuesdays and Thursdays are closed.' : ''); loadSlots(); });
+  dateField.addEventListener('change', () => { const closed = isClosed(dateField.value); dateField.classList.toggle('closed-date', closed); dateField.setCustomValidity(closed ? (isPastDate(dateField.value) ? 'Please choose a current or future date.' : 'Tuesdays and Thursdays are closed.') : ''); loadSlots(); });
   form.querySelectorAll('[data-next]').forEach((button) => button.addEventListener('click', () => {
     if (currentStep === 2 && !currentSelectedTime) {
       showError('Please pick a time before continuing.');

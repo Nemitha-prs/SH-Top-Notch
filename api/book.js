@@ -6,7 +6,7 @@ import { Resend } from 'resend';
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
 const compactUtc = (date) => date.toISOString().replace(/[-:]/g, '').replace('.000', '');
-const toPerthDate = (date, time) => new Date(`${date}T${time}:00+08:00`);
+const toPerthDate = (date, time) => new Date(`${date}T${time}:00+08:00`); // explicit +08:00 offset yields a correct UTC instant regardless of server timezone
 const minutesFromTime = (time) => { const [hours, minutes] = time.split(':').map(Number); return hours * 60 + minutes; };
 const normalizeSupabaseUrl = (value = '') => { const match = value.match(/^https:\/\/supabase\.com\/dashboard\/project\/([a-z0-9]+)\/?$/i); return match ? `https://${match[1]}.supabase.co` : value.replace(/\/$/, ''); };
 const calendarInvite = (booking, start, end) => ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//SH Top Notch//Booking//EN', 'METHOD:REQUEST', 'BEGIN:VEVENT', `UID:${booking.uid}`, `DTSTAMP:${compactUtc(new Date())}`, `DTSTART:${compactUtc(start)}`, `DTEND:${compactUtc(end)}`, `SUMMARY:SH Top Notch Detailing - ${booking.service_package} (${booking.client_name})`, `LOCATION:${booking.address}`, `DESCRIPTION:Vehicle: ${booking.vehicle_type}\\nMobile: ${booking.client_phone}\\nEmail: ${booking.client_email}`, 'STATUS:CONFIRMED', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
@@ -49,16 +49,19 @@ export default async function handler(request, response) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(start_time) || !Number.isInteger(duration_minutes) || duration_minutes <= 0) return response.status(400).json({ success: false, error: 'Invalid booking date, time, or duration' });
   const startDate = toPerthDate(date, start_time);
   if (Number.isNaN(startDate.getTime())) return response.status(400).json({ success: false, error: 'Invalid booking date or time' });
+  if (startDate.getTime() <= Date.now()) return response.status(400).json({ success: false, error: 'This appointment time has already passed. Please choose a future time.' });
+  if (startDate.getTime() < Date.now() + 2 * 60 * 60 * 1000) return response.status(400).json({ success: false, error: 'Bookings require a minimum of 2 hours notice.' });
   const endDate = new Date(startDate.getTime() + duration_minutes * 60000);
   const perthDay = new Date(`${date}T12:00:00+08:00`).getDay();
   if (perthDay === 5 && (minutesFromTime(start_time) < 16 * 60 || minutesFromTime(start_time) + duration_minutes > 18 * 60)) return response.status(400).json({ success: false, error: 'Friday bookings are available from 4:00 PM to 6:00 PM only.' });
   let booking;
   try {
     const supabase = createClient(normalizeSupabaseUrl(supabaseUrl), supabaseKey, { auth: { persistSession: false } });
-    // Overlap rule: an existing booking conflicts if it starts before our slot ends AND ends after our slot starts.
-    const overlapCheck = await supabase.from('bookings').select('id').lt('start_time', endDate.toISOString()).gt('end_time', startDate.toISOString()).limit(1);
+    // Overlap rule: an existing (non-cancelled) booking conflicts if it starts before our slot ends AND ends after our slot starts.
+    // start_time/end_time are stored as UTC timestamptz (converted from the +08:00 instant above), so this compares like-for-like instants.
+    const overlapCheck = await supabase.from('bookings').select('id,status').lt('start_time', endDate.toISOString()).gt('end_time', startDate.toISOString());
     if (overlapCheck.error) { console.error('Supabase overlap check error:', overlapCheck.error); return response.status(500).json({ success: false, error: `Database check error: ${overlapCheck.error.message}` }); }
-    if (overlapCheck.data && overlapCheck.data.length > 0) return response.status(409).json({ success: false, error: 'This time slot has just been reserved. Please pick another time.' });
+    if ((overlapCheck.data || []).some((row) => row.status !== 'cancelled')) return response.status(409).json({ success: false, error: 'This slot is already booked. Please choose another time.' });
     const result = await supabase.from('bookings').insert([{ client_name, client_email, client_phone, service_package, vehicle_type: `${vehicle_type} (${vehicle_model})`, address, start_time: startDate.toISOString(), end_time: endDate.toISOString() }]).select();
     if (result.error) { console.error('Supabase DB Insert Error:', result.error); return response.status(500).json({ success: false, error: `Database insert error: ${result.error.message}` }); }
     booking = result.data;
