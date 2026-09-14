@@ -468,6 +468,8 @@ h3 { font-size: 22px; }
 .booking-aside { padding: 25px; background: var(--obsidian); color: var(--white); }
 .booking-aside p, .booking-aside li { color: #b8c2cf; font-size: 13px; }
 .booking-aside ul { padding-left: 18px; }
+.cancellation-notice { display: flex; align-items: center; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.cancellation-notice .social-icon-link { display: inline-flex; color: #25D366; flex-shrink: 0; }
 .confirmation { display: none; padding: 30px; background: #e5f7f4; border: 1px solid #a3ddd4; }
 .confirmation.visible { display: block; }
 .preloader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--obsidian); transition: opacity 220ms ease, visibility 220ms ease; }
