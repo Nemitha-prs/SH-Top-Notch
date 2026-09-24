@@ -1,9 +1,9 @@
-// One-off script: masks images/logo.jpeg into a circular favicon (PNG + ICO).
+// One-off script: masks the supplied favicon into a circular favicon (PNG + ICO).
 import sharp from "sharp";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-const SRC = path.resolve("images/logo.jpeg");
+const SRC = path.resolve("images/favicon.ico");
 const SIZES = [16, 32, 48, 64, 128, 256];
 
 const circleMask = (size) => Buffer.from(
@@ -49,15 +49,40 @@ function buildIco(pngBuffers) {
 }
 
 const icoSizes = [16, 32, 48];
+const ico = await readFile(SRC);
+const imageOffset = ico.readUInt32LE(18);
+const dibSize = ico.readUInt32LE(imageOffset);
+const width = ico.readInt32LE(imageOffset + 4);
+const height = ico.readInt32LE(imageOffset + 8) / 2;
+const pixelOffset = imageOffset + dibSize;
+const pixels = Buffer.alloc(width * height * 4);
+
+for (let y = 0; y < height; y += 1) {
+  for (let x = 0; x < width; x += 1) {
+    const sourceOffset = pixelOffset + ((height - y - 1) * width + x) * 4;
+    const targetOffset = (y * width + x) * 4;
+    pixels[targetOffset] = ico[sourceOffset + 2];
+    pixels[targetOffset + 1] = ico[sourceOffset + 1];
+    pixels[targetOffset + 2] = ico[sourceOffset];
+    pixels[targetOffset + 3] = ico[sourceOffset + 3];
+  }
+}
+
+const source = sharp(pixels, { raw: { width, height, channels: 4 } });
 const icoFrames = [];
 for (const size of icoSizes) {
-  icoFrames.push({ size, buffer: await makeCircularPng(size) });
+  const resized = await source.resize(size, size, { fit: "cover" }).png().toBuffer();
+  const buffer = await sharp(resized)
+    .composite([{ input: circleMask(size), blend: "dest-in" }])
+    .png()
+    .toBuffer();
+  icoFrames.push({ size, buffer });
 }
 
 const icoBuffer = buildIco(icoFrames);
 await writeFile(path.resolve("images/favicon.ico"), icoBuffer);
 
-const png256 = await makeCircularPng(256);
+const png256 = await source.resize(256, 256, { fit: "cover" }).composite([{ input: circleMask(256), blend: "dest-in" }]).png().toBuffer();
 await writeFile(path.resolve("images/favicon.png"), png256);
 
 console.log("Generated images/favicon.ico and images/favicon.png");

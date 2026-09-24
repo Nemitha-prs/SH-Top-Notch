@@ -37,7 +37,10 @@ button { cursor: pointer; }
 .site-header { border-bottom: 1px solid rgba(255,255,255,.08); }
 .nav { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.04em; }
-.brand-mark { display: block; width: 52px; height: 52px; flex: 0 0 52px; overflow: hidden; border-radius: 50%; background: var(--obsidian) url("../images/logo.jpeg") center / contain no-repeat; font-size: 0; transform: none; }
+.brand-mark { display: block; width: 200px; height: 58px; flex: 0 0 200px; overflow: visible; border-radius: 0; background: transparent url("../images/logono-bg.png") left center / contain no-repeat; font-size: 0; transform: none; }
+.site-header .brand-mark { width: 200px; height: 58px; flex: 0 0 200px; overflow: visible; object-fit: contain; object-position: left center; border-radius: 0; background: transparent url("../images/logono-bg.png") left center / contain no-repeat; mix-blend-mode: normal; }
+.site-header .brand span:last-child { display: none; }
+.site-footer .brand span:last-child { display: none; }
 .brand span:last-child { font-size: 17px; }
 .nav-toggle { display: inline-grid; gap: 4px; padding: 8px; border: 0; background: transparent; color: var(--white); }
 .nav-toggle i { display: block; width: 22px; height: 2px; background: currentColor; }
