@@ -1,7 +1,7 @@
 (() => {
   const form = document.querySelector('#booking-form'); if (!form) return;
   const durations = { 'Entry Detail': { Hatchback: 120, Sedan: 120, '4WD': 180 }, 'Transitional Detail': { Hatchback: 180, Sedan: 180, '4WD': 210 }, 'TopNotch Detail': { Hatchback: 240, Sedan: 240, '4WD': 300 } };
-  const windows = { 0: ['07:00', '18:00'], 1: ['07:00', '14:00'], 2: null, 3: ['07:00', '18:00'], 4: null, 5: ['16:00', '18:00'], 6: ['07:00', '18:00'] };
+  const windows = { 0: ['07:00', '18:00'], 1: null, 2: ['07:00', '18:00'], 3: ['07:00', '18:00'], 4: ['07:00', '18:00'], 5: ['16:00', '18:00'], 6: ['07:00', '18:00'] };
   const steps = [...form.querySelectorAll('.form-step')], progress = [...document.querySelectorAll('[data-progress]')], packageField = document.querySelector('#servicePackage'), vehicleField = document.querySelector('#vehicleType'), dateField = document.querySelector('#bookingDate'), startField = document.querySelector('#selectedTime'), timeInput = document.getElementById('selected-time-input'), slots = document.querySelector('#slotsContainer'), slotStatus = document.querySelector('#slot-status'), durationCopy = document.querySelector('#duration-copy'), error = document.querySelector('#form-error'), phoneInput = document.getElementById('customer-phone'), phoneError = phoneInput?.parentElement?.querySelector('.field-error');
   const dropOffAddress = '9 Addingham Dr, Ellenbrook WA 6069';
   const availabilityCache = {};
@@ -17,6 +17,7 @@
   const duration = () => durations[packageField.value]?.[vehicleField.value] || 0;
   const dateAtTime = (date, time) => new Date(`${date}T${time}:00+08:00`);
   const isPastDate = (date) => !date || date < perthTodayStr();
+  const isMonday = (date) => !!date && new Date(`${date}T12:00:00+08:00`).getDay() === 1;
   const isClosed = (date) => !date || isPastDate(date) || !windows[new Date(`${date}T12:00:00+08:00`).getDay()];
   const showLoadingSlots = () => {
     if (!slots) return;
@@ -55,6 +56,7 @@
     if (!slots) return;
     const date = dateField.value, selectedDuration = duration(); currentDuration = selectedDuration;
     slots.innerHTML = '';
+    if (isMonday(date)) { slots.innerHTML = '<p class="slot-empty">Workshop closed on Mondays</p>'; slotStatus.textContent = 'Workshop closed on Mondays'; persistSelectedTime(''); return; }
     if (!date || !selectedDuration) { slots.innerHTML = '<p class="slot-empty">Choose a service, vehicle, and date first.</p>'; return; }
     if (isPastDate(date)) { slots.innerHTML = '<p class="slot-empty">This date has passed. Please choose another date.</p>'; slotStatus.textContent = ''; persistSelectedTime(''); return; }
     const dayWindow = windows[new Date(`${date}T12:00:00+08:00`).getDay()];
@@ -95,6 +97,7 @@
     }
   };
   const loadSlots = async () => {
+    if (isMonday(dateField.value)) { renderSlots([]); return; }
     if (!dateField.value || isClosed(dateField.value)) {
       if (slots) slots.innerHTML = '<p class="slot-empty">Choose a service, vehicle, and date first.</p>';
       return;
@@ -136,7 +139,7 @@
   }
   packageField.addEventListener('change', () => { durationCopy.textContent = duration() ? `This appointment takes ${Math.floor(duration() / 60)} hours${duration() % 60 ? ` ${duration() % 60} minutes` : ''}.` : 'Your appointment duration will appear here.'; if (dateField.value) loadSlots(); });
   vehicleField.addEventListener('change', () => { packageField.dispatchEvent(new Event('change')); });
-  dateField.addEventListener('change', () => { const closed = isClosed(dateField.value); dateField.classList.toggle('closed-date', closed); dateField.setCustomValidity(closed ? (isPastDate(dateField.value) ? 'Please choose a current or future date.' : 'Tuesdays and Thursdays are closed.') : ''); loadSlots(); });
+  dateField.addEventListener('change', () => { const closed = isClosed(dateField.value); dateField.classList.toggle('closed-date', closed); dateField.setCustomValidity(closed ? (isPastDate(dateField.value) ? 'Please choose a current or future date.' : (isMonday(dateField.value) ? 'Workshop closed on Mondays' : 'This day is closed.')) : ''); loadSlots(); });
   form.querySelectorAll('[data-next]').forEach((button) => button.addEventListener('click', () => {
     if (currentStep === 2 && !currentSelectedTime) {
       showError('Please pick a time before continuing.');

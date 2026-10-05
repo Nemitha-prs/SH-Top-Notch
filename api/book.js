@@ -47,6 +47,7 @@ export default async function handler(request, response) {
   if ([client_name, client_email, client_phone, service_package, vehicle_type, address, date, start_time].some((value) => !value)) return response.status(400).json({ success: false, error: 'Missing booking details' });
   if (!/^(?:\+61|0)?\s?(?:\d[\s-]?){8,}\d$/.test(String(client_phone).replace(/\s+/g, ''))) return response.status(400).json({ success: false, error: 'Please enter a valid mobile number.' });
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(start_time) || !Number.isInteger(duration_minutes) || duration_minutes <= 0) return response.status(400).json({ success: false, error: 'Invalid booking date, time, or duration' });
+  if (new Date(`${date}T12:00:00+08:00`).toLocaleDateString('en-US', { weekday: 'long', timeZone: 'Australia/Perth' }) === 'Monday') return response.status(400).json({ error: 'Bookings are not available on Mondays. Please select Tuesday through Sunday.' });
   const startDate = toPerthDate(date, start_time);
   if (Number.isNaN(startDate.getTime())) return response.status(400).json({ success: false, error: 'Invalid booking date or time' });
   if (startDate.getTime() <= Date.now()) return response.status(400).json({ success: false, error: 'This appointment time has already passed. Please choose a future time.' });
