@@ -22,8 +22,8 @@
 		const maintenanceLabel = document.querySelector('.maintenance-banner strong');
 		if (maintenanceLabel) maintenanceLabel.textContent = 'Regular Maintenance Discounts:';
 		const prices = {
-			full: { Entry: { hatch: 169, sedan: 199, '4wd': 229, seven: 269 }, Transitional: { hatch: 339, sedan: 409, '4wd': 469, seven: 499 }, TopNotch: { hatch: 519, sedan: 609, '4wd': 699, seven: 729 } },
-			interior: { Transitional: { hatch: 169, sedan: 199, '4wd': 229, seven: 259 }, TopNotch: { hatch: 279, sedan: 309, '4wd': 349, seven: 389 } }
+			full: { Entry: { hatch: 169, sedan: 199, '4wd': 229, seven: 269 }, Transitional: { hatch: 319, sedan: 389, '4wd': 449, seven: 479 }, TopNotch: { hatch: 469, sedan: 559, '4wd': 649, seven: 679 } },
+			interior: { Transitional: { hatch: 149, sedan: 179, '4wd': 209, seven: 239 }, TopNotch: { hatch: 229, sedan: 259, '4wd': 299, seven: 339 } }
 		};
 		const packages = {
 			full: [{ name: 'Entry Detail', key: 'Entry', items: ['Body Wash / Dry', 'Mirrors Detail', 'Tyre Gloss', 'Wheels Detail', 'Windows Detail (Exterior & Interior)', 'Dashboard Detail', 'Rubbish Removal', 'Full Interior Vacuum'] }, { name: 'Transitional Detail', key: 'Transitional', items: ['Everything in Entry Detail', 'Wheel Arch Detail', 'Body Wax / Polish', 'Headlight Restoration', 'Carpet Shampoo', 'Deodorize Treatment', 'Door Cards Wiped', 'Interior Fine Detail', 'Pet Hair & Sand Removal'] }, { name: 'TopNotch Detail', key: 'TopNotch', items: ['Everything in Transitional Detail', 'Clay Bar Decontamination Treatment', 'Engine Bay Detail', 'Paint Protection', 'Plastic & Rubber Exterior Trim Restoration', 'Door Shuts & Jambs Deep Detail', 'Leather & Fabric Protective Treatment', 'Roof Lining Detail'] }],
