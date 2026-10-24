@@ -289,6 +289,17 @@ h3 { font-size: 22px; }
 .header-services::before { background-image: url("../images/1.jpg"); }
 .header-gallery::before { background-image: url("../images/2.jpg"); }
 .header-booking::before { background-image: url("../images/3.jpg"); }
+.header-privacy::before { background-image: url("../images/1.jpg"); }
+.privacy-article { max-width: 760px; }
+.privacy-article h2 { margin: 36px 0 12px; font-size: 22px; letter-spacing: -.03em; }
+.privacy-article h2:first-child { margin-top: 0; }
+.privacy-article p, .privacy-article li { color: var(--slate); font-size: 16px; }
+.privacy-article ul { margin: 0 0 16px; padding-left: 20px; }
+.privacy-article li { margin: 6px 0; }
+.privacy-article a { color: var(--cyan-deep); text-decoration: underline; }
+.privacy-article a:hover { color: var(--cyan); }
+.footer-legal-link { margin-left: 10px; color: #aab5c1; font-weight: 700; }
+.footer-legal-link:hover { color: var(--cyan); }
 @keyframes headerDrift {
 	0% { transform: scale(1) translate3d(0, 0, 0); }
 	100% { transform: scale(1.04) translate3d(-8px, -4px, 0); }
